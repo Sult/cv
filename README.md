@@ -88,10 +88,10 @@ Getting Wifi back to work. Fix email clients. Help set up network drives etc.
 
 ### Hosting ###
 
-Mostly website related hosting (Nginx, Supervisor, Systemd, Gunicorn).
-Automated deployment with Ansible and Jenkins.
-Containers with Docker
-Firewall setup
+- Website related hosting (Nginx, Supervisor, Systemd, Gunicorn PostgreSQL etc)
+- Automated deployment flows with Ansible and Jenkins
+- Containers with Docker
+- Firewall setup
 
 ### Databases ###
 - PostgreSQL
