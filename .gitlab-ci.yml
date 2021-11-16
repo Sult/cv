@@ -1,0 +1,40 @@
+stages:
+  - build
+  - upload
+  - release
+
+variables:
+  PACKAGE_VERSION: "1.0.0"
+  PACKAGE_REGISTRY_URL: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/cv/${PACKAGE_VERSION}"
+
+build:
+  stage: build
+  image: debian:stable
+  script:
+    - apt-get update
+    - apt-get install -y texlive-latex-extra texlive-latex-recommended texlive-luatex texlive-xetex texlive-fonts-extra wkhtmltopdf pandoc-citeproc pandoc make git
+    - make
+  artifacts:
+    paths:
+      - cv.*
+  only:
+    - master
+
+upload:
+  stage: upload
+  image: curlimages/curl:latest
+  script:
+    - |
+      for f in cv.*; do curl --header "JOB-TOKEN: ${CI_JOB_TOKEN}" --upload-file $f ${PACKAGE_REGISTRY_URL}/$f; done
+  only:
+    - master
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - |
+      release-cli create --name "Curriculum Vitae" --tag-name job-${CI_JOB_ID} --ref ${CI_COMMIT_SHA} \
+        $(for f in cv.*; do echo --assets-link "{\"name\":\"${f}\",\"url\":\"${PACKAGE_REGISTRY_URL}/${f}\"}"; done)
+  only:
+    - master
